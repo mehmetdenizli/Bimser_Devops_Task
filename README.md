@@ -184,6 +184,13 @@ Terraform ile kurulum için aşağıdaki adımları izleyin:
     terraform plan
     ```
 3.  **Dağıtımı Başlatma:**
+
+### ⚠️ Zamanlama Uyarısı (Race Condition)
+
+Altyapı kurulumu sırasında VM'lerin açılması ile servislerin (SSH, Docker, K3s) hazır hale gelmesi arasında zaman farkı oluşabilir. Bu durum, nadiren de olsa ilk denemede **"Connection refused"** veya **"Command not found"** hatalarına yol açabilir.
+
+**Çözüm:** Kod içerisine servislerin hazır olmasını bekleyen kontrol döngüleri eklenmiştir. Eğer bir hata ile karşılaşırsanız, `terraform apply` komutunu tekrar çalıştırmanız kurulumu başarıyla tamamlayacaktır.
+
     ```bash
     terraform apply -auto-approve
     ```
