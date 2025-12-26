@@ -92,6 +92,7 @@ resource "null_resource" "create_ssl_secret" {
     }
 
     inline = [
+      "while [ ! -f /usr/local/bin/kubectl ]; do echo 'Kubectl dosyasının inmesi bekleniyor...'; sleep 3; done",
       "openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /tmp/tls.key -out /tmp/tls.crt -subj '/CN=app.local'",
       "kubectl create secret tls app-tls-secret --key /tmp/tls.key --cert /tmp/tls.crt --dry-run=client -o yaml | kubectl apply -f -"
     ]
@@ -110,6 +111,9 @@ resource "null_resource" "setup_builder_registry" {
     }
 
     inline = [
+
+      "until docker info >/dev/null 2>&1; do echo 'Docker servisi bekleniyor...'; sleep 3; done",
+      "sudo mkdir -p /etc/docker",
       "docker run -d -p 5001:5000 --restart=always --name registry registry:2 || true",
 
       "BUILDER_IP=$(hostname -I | awk '{print $1}')",
@@ -155,6 +159,9 @@ resource "null_resource" "sync_app_files" {
 
   provisioner "local-exec" {
     command = <<-EOT
+      echo "Cluster servislerinin oturması için 15 saniye bekleniyor..."
+      sleep 15
+
       BUILDER_IP=$(grep "builder_ip=" nodes_ip.txt | cut -d'=' -f2) 
       
       IMAGE_TAG="v-$(date +%Y%m%d-%H%M)"
@@ -166,14 +173,14 @@ resource "null_resource" "sync_app_files" {
       scp -o StrictHostKeyChecking=no ../manifests/*.yaml ${var.vm_user}@$BUILDER_IP:/home/${var.vm_user}/bimser-app/manifests/
       ssh -o StrictHostKeyChecking=no ${var.vm_user}@$BUILDER_IP "sed -i \"s|image:.*|image: $FULL_IMAGE_PATH|g\" /home/${var.vm_user}/bimser-app/manifests/deployment.yaml"
       ssh -o StrictHostKeyChecking=no ${var.vm_user}@$BUILDER_IP <<EOF
-        cd /home/${var.vm_user}/bimser-app
-        kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.13.12/config/manifests/metallb-native.yaml
-        kubectl wait --namespace metallb-system --for=condition=ready pod --selector=app=metallb --timeout=300s
-        sleep 15
-        docker build -t $FULL_IMAGE_PATH .
-        docker push $FULL_IMAGE_PATH
-        kubectl apply -f manifests/
-        kubectl patch svc ingress-nginx-controller -n ingress-nginx -p '{"spec": {"type": "LoadBalancer"}}'
+      cd /home/${var.vm_user}/bimser-app
+      kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.13.12/config/manifests/metallb-native.yaml
+      kubectl wait --namespace metallb-system --for=condition=ready pod --selector=app=metallb --timeout=300s
+      sleep 15
+      docker build -t $FULL_IMAGE_PATH .
+      docker push $FULL_IMAGE_PATH
+      kubectl apply -f manifests/
+      kubectl patch svc ingress-nginx-controller -n ingress-nginx -p '{"spec": {"type": "LoadBalancer"}}'
 EOF
     EOT 
   }

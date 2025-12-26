@@ -6,6 +6,8 @@ resource "null_resource" "bimser_builder" {
 
       multipass launch --name bimser-builder --cpus ${var.builder_specs.cpus} --memory ${var.builder_specs.memory} --disk ${var.builder_specs.disk} > /dev/null 2>&1
       
+      echo "Makinenin 'Running' olması bekleniyor..."
+      until multipass info bimser-builder | grep -q "Running"; do sleep 2; done
 
       echo "Bimser Builder makinesi hazirlaniyor..."
       sleep 20 
@@ -13,6 +15,10 @@ resource "null_resource" "bimser_builder" {
       IP=$(multipass info bimser-builder --format csv | grep bimser-builder | cut -d, -f3)
       echo "builder_ip=$IP" > nodes_ip.txt
       
+      echo "SSH servisinin hazir olmasi bekleniyor..."
+      until nc -zvw1 $IP 22; do sleep 2; done
+
+      echo "Builder uzerine SSH yetkilendirme yapiliyor..."
       # 3. SSH Yetkilendirme
       multipass exec bimser-builder -- bash -c "mkdir -p ~/.ssh && echo '${file(var.ssh_public_key_path)}' >> ~/.ssh/authorized_keys"
 
