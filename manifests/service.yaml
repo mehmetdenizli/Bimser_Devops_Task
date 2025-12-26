@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: bimser-python-service
+spec:
+  selector:
+    app: bimser-python
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 5000
