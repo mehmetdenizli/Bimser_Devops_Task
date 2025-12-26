@@ -49,7 +49,7 @@ Operasyonel Otomasyon: Terraform, sadece VM oluşturmakla kalmaz; Master node'da
 Hafiflik ve Performans: K3s kullanımı sayesinde, kısıtlı donanım kaynaklarında bile tam özellikli (Ingress, LB, Registry) bir Kubernetes deneyimi sunulur .
 
 
-## 2. Tech Stack & Tools
+## 2.  Teknoloji ve Araçlar
 Bu projede seçilen tüm araçlar, on-premise bir ortamın kısıtlı kaynaklarını en verimli şekilde kullanmak ve kurumsal standartlara uygun bir otomasyon sağlamak amacıyla belirlenmiştir.
 
 ### 2.1 Altyapı & Operasyonel Otomasyon
@@ -419,9 +419,11 @@ Kubernetes kurulumunda "sıralama" her şeydir. Terraform'un bu sıralamayı do�
 ## 11. Cleanup (Altyapıyı Kaldırma)
 
 Proje ile oluşturulan tüm kaynakları (sanal makineler, ağ konfigürasyonları ve geçici dosyalar) tek bir komutla güvenli bir şekilde temizleyebilirsiniz.
+Daha sonra multipass nodelarini purge yapabilirsiniz.
 
 ```bash
 terraform destroy -auto-approve
+multipass purge
 ```
 ---
 
