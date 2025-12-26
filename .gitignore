@@ -1,0 +1,13 @@
+# Terraform State
+*.tfstate
+*.tfstate.backup
+.terraform/
+.terraform.lock.hcl
+
+# Hassas Dosyalar
+nodes_ip.txt
+node_token.txt
+*.yaml.tmp
+
+# OS Dosyaları
+.DS_Store
