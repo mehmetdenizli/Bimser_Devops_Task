@@ -185,7 +185,7 @@ Terraform ile kurulum için aşağıdaki adımları izleyin:
     ```
 3.  **Dağıtımı Başlatma:**
 
-> [!IMPORTANT]⚠️
+> [!IMPORTANT]
 > ### Zamanlama Uyarısı (Race Condition)
 >
 > Altyapı kurulumu sırasında VM'lerin açılması ile servislerin (SSH, Docker, K3s) hazır hale gelmesi arasında zaman farkı oluşabilir.
