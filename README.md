@@ -2,7 +2,7 @@
 
 ## 1. Proje Genel Bakış & Mimari
 
-## 4. Proje Yapısı 
+## 1.1 Proje Yapısı 
 
 ```text
 Bimser_Devops_Task/
@@ -17,18 +17,18 @@ Bimser_Devops_Task/
 │   └── provider.tf       # Terraform sağlayıcıları
 └── README.md             # Proje dokümantasyonu
 ```
-### 1.1 Özet
+### 1.2 Özet
 
 Bu proje, on-premise bir ortamda (Multipass VM'leri) tam otomatize edilmiş bir Kubernetes (K3s) cluster kurulumunu ve üzerine SSL destekli bir Flask uygulamasının dağıtımını kapsamaktadır. 
 
 Süreç, sanal makinelerin oluşturulmasından uygulamanın HTTPS üzerinden yayına alınmasına kadar tek bir terraform apply komutu ile yönetilmektedir.
 
-### 1.2 Yüksek Seviyeli Mimari Diyagram (Mantıksal)
+### 1.3 Yüksek Seviyeli Mimari Diyagram (Mantıksal)
 
 ![Diagram](images/Diagram.jpg)
 
 
-### 1.2.1 Sistemin Mantıksal Katmanları:
+### 1.3.1 Sistemin Mantıksal Katmanları:
 
 Orkestrasyon Katmanı (Local): Terraform, yerel makine üzerinden tüm VM yaşam döngüsünü ve operasyonel scriptleri (provisioners) yöneten ana beyin rolündedir .
 
@@ -40,7 +40,7 @@ Kubernetes Kontrol Düzlemi Master & Worker Node: K3s kontrol düzlemi burasidir
 Ağ Katmanı (Networking): MetalLB L2 modu ile servis IP'lerini yönetirken, Ingress Controller app.local üzerinden SSL sonlandırması yaparak trafiği içeriye alır .
 
 
-### 1.2.2 Neden Bu Mimari?
+### 1.3.2 Neden Bu Mimari?
 
 M3 Mac & Mimari Tutarlılığı: Geliştirme ortamı Apple Silicon (ARM64) olsa bile, build işleminin Builder VM üzerinde yapılması, imajların hedef sunucu mimarisiyle %100 uyumlu olmasını sağlar .
 
