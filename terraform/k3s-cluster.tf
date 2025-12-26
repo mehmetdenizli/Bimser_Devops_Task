@@ -79,39 +79,6 @@ resource "null_resource" "setup_builder_kubeconfig" {
   }
 }
 
-# resource "null_resource" "install_metallb" {
-#   depends_on = [null_resource.k3s_master, null_resource.k3s_worker, null_resource.configure_k3s_registry]
-
-#   connection {
-#     type        = "ssh"
-#     user        = var.vm_user
-#     host        = regex("master_ip=([0-9.]+)", data.local_file.nodes_ips.content)[0]
-#     private_key = file(var.ssh_private_key_path)
-#   }
-
-#   provisioner "file" {
-#     source      = "manifests/metallb-config.yaml"
-#     destination = "/tmp/metallb-config.yaml"
-#   }
-
-#   provisioner "remote-exec" {
-#     inline = [
-#       "sudo chmod 644 /etc/rancher/k3s/k3s.yaml",
-#       "sudo kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.13.12/config/manifests/metallb-native.yaml",
-      
-#       "echo 'MetalLB podlari bekleniyor...'",
-#       "sudo kubectl wait --namespace metallb-system --for=condition=ready pod --selector=app=metallb --timeout=300s",
-      
-#       "sleep 20",
-
-#       "echo 'MetalLB IP havuzu yapılandırılıyor...'",
-#       "for i in 1 2 3 4 5; do sudo kubectl apply -f /tmp/metallb-config.yaml && break || (echo 'Bekleniyor...' && sleep 10); done",
-
-#       "echo 'Ingress servisi LoadBalancer yapiliyor...'",
-#       "sudo kubectl patch svc ingress-nginx-controller -n ingress-nginx -p '{\"spec\": {\"type\": \"LoadBalancer\"}}'"
-#     ]
-#   }
-# }
 
 resource "null_resource" "create_ssl_secret" {
   depends_on = [null_resource.setup_builder_kubeconfig]
@@ -196,7 +163,7 @@ resource "null_resource" "sync_app_files" {
 
       ssh -o StrictHostKeyChecking=no ${var.vm_user}@$BUILDER_IP "mkdir -p /home/${var.vm_user}/bimser-app/manifests" 
       scp -o StrictHostKeyChecking=no app.py Dockerfile ${var.vm_user}@$BUILDER_IP:/home/${var.vm_user}/bimser-app/ 
-      scp -o StrictHostKeyChecking=no manifests/*.yaml ${var.vm_user}@$BUILDER_IP:/home/${var.vm_user}/bimser-app/manifests/
+      scp -o StrictHostKeyChecking=no ../manifests/*.yaml ${var.vm_user}@$BUILDER_IP:/home/${var.vm_user}/bimser-app/manifests/
       ssh -o StrictHostKeyChecking=no ${var.vm_user}@$BUILDER_IP "sed -i \"s|image:.*|image: $FULL_IMAGE_PATH|g\" /home/${var.vm_user}/bimser-app/manifests/deployment.yaml"
       ssh -o StrictHostKeyChecking=no ${var.vm_user}@$BUILDER_IP <<EOF
         cd /home/${var.vm_user}/bimser-app

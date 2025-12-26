@@ -2,6 +2,21 @@
 
 ## 1. Proje Genel Bakış & Mimari
 
+## 4. Proje Yapısı 
+
+```text
+Bimser_Devops_Task/
+├── images/               # README için ekran görüntüleri ve diyagramlar
+├── manifests/            # Kubernetes Deployment, Service, Ingress ve MetalLB dosyaları
+├── terraform/            # Ana çalışma dizini
+│   ├── app.py            # Flask Uygulaması
+│   ├── Dockerfile        # İmaj Build talimatları
+│   ├── infra.tf          # VM Oluşturma (Multipass)
+│   ├── k3s-cluster.tf    # K3s, SSL, Registry ve Deployment otomasyonu
+│   ├── variables.tf      # Değişken tanımları
+│   └── provider.tf       # Terraform sağlayıcıları
+└── README.md             # Proje dokümantasyonu
+```
 ### 1.1 Özet
 
 Bu proje, on-premise bir ortamda (Multipass VM'leri) tam otomatize edilmiş bir Kubernetes (K3s) cluster kurulumunu ve üzerine SSL destekli bir Flask uygulamasının dağıtımını kapsamaktadır. 
@@ -137,19 +152,28 @@ Bu proje, altyapı hazırlığından uygulama yayınına kadar tam otomatize bir
 
 ### 6.1 Hazırlık
 
-1.  **Repository'i Clone Edin:**
+1.  **Repository'yi Klonlayın ve Proje Dizine Girin:**
     ```bash
     git clone <repository-url>
-    cd <project-folder>
+    cd Bimser_Devops_Task
     ```
-2.  **SSH Anahtarlarını Kontrol Edin:**
-    Varsayılan olarak `~/.ssh/id_rsa.pub` yolu kullanılır. Farklı bir yol kullanıyorsanız `variables.tf` dosyasından güncelleyiniz.
-3.  **Multipass Kontrolü:**
-    Sisteminizde Multipass'in kurulu ve çalışır durumda olduğunu teyit edin.
+2.  **Terraform Dizinine Geçiş Yapın:**
+    *Önemli: Tüm altyapı komutları bu dizin altından çalıştırılmalıdır.*
+    ```bash
+    cd terraform
+    ```
+3.  **SSH Anahtar Çiftini Kontrol Edin (Kritik):**
+    Terraform'un sanal makinelere erişebilmesi için yerel makinenizde bir SSH anahtar çifti bulunmalıdır.
+    * **Kontrol Et:** `ls -l ~/.ssh/id_rsa*` komutu ile anahtarların varlığını teyit edin.
+    * **Oluştur (Yoksa):** Eğer dosya bulunamadıysa, aşağıdaki komutla yeni bir anahtar çifti oluşturun:
+        ```bash
+        ssh-keygen -t rsa -b 4096 -f ~/.ssh/id_rsa -N ""
+        ```
+    * **Yapılandırma:** Varsayılan olarak `~/.ssh/id_rsa.pub` yolu kullanılır. Farklı bir yol kullanıyorsanız `terraform/variables.tf` içindeki `ssh_public_key_path` değişkenini güncelleyin.
 
-### 6.2 Terraform Workflow
+### 6.2 Terraform ile Kurulum
 
-Tüm süreç tek bir komut dizisi ile başlatılabilir:
+Terraform ile kurulum için aşağıdaki adımları izleyin:
 
 1.  **Terraform Başlatma:**
     ```bash
