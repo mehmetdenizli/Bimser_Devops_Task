@@ -423,3 +423,21 @@ Proje ile oluşturulan tüm kaynakları (sanal makineler, ağ konfigürasyonlar�
 ```bash
 terraform destroy -auto-approve
 ```
+---
+
+## 12. Mimari Gelişim ve Production (Üretim) Planı
+
+Bu proje, yerel laboratuvar ortamı kısıtları ve Multipass entegrasyonu nedeniyle bazı pratik çözümler üzerine kurulabilmiştir. Gerçek bir üretim ortamında şu profesyonel yaklaşımlar tercih edilebilir:
+
+* **Native Kaynaklar ve Modüler Yapı:** `null_resource` ve betik tabanlı yönetim yerine, bulut sağlayıcıların (AWS, Azure vb.) yerel Terraform kaynakları kullanılabilir ve kod yapısı tekrar kullanılabilir modüllere ayrılabilir.
+* **Beyan Esaslı (Declarative) Akışa Geçiş:** `local-exec` ve `remote-exec` gibi Terraform durum takibi dışında kalan yöntemler yerine; Ansible veya Cloud-Init gibi araçlarla altyapı yönetimi tamamen declarative hale getirilebilir.
+* **Gelişmiş SSL/TLS Otomasyonu:** Test ortamındaki "Self-Signed" sertifika kullanımı yerine; Cert-Manager ve Let's Encrypt entegrasyonuyla otomatik yenilenen ve tarayıcılarca tanınan sertifikalar yönetilebilir.
+* **Modern Trafik Yönetimi:** Mevcut Nginx Ingress Controller yapısı, daha esnek trafik kontrolü ve rol tabanlı yönetim sunabilen modern Kubernetes Gateway API standartlarına taşınabilir.
+* **İmaj Güvenliği ve Tarama:** Docker imajları oluşturulduktan sonra; Trivy veya Snyk gibi araçlarla güvenlik taramasından geçirilebilir ve yalnızca güvenli imajların dağıtımı sağlanabilir.
+* **Cluster ve Ağ Güvenliği (Hardening):**
+    * Tüm node'lara doğrudan erişim yerine, yalnızca bir Bastion Host üzerinden güvenli geçiş yapılabilir.
+    * Podlar arası trafiği denetlemek amacıyla Network Policy'ler uygulanabilir.
+    * Hassas veriler dosya sistemi yerine HashiCorp Vault gibi vault araçlarıyla korunabilir.
+* **Merkezi Durum Yönetimi:** Terraform durum dosyası yerel disk yerine; S3 ve DynamoDB gibi "Remote Backend" sistemlerinde kilitlenebilir şekilde tutularak ekip çalışmasına uygun hale getirilebilir.
+* **GitOps Süreçleri:** Uygulama dağıtımı manuel tetikleme yerine; ArgoCD veya Flux gibi araçlarla tam otomatik bir GitOps akışına dönüştürülebilir.
+* **Mimari Vizyon:** Bu projede kullanılan **Builder Node** yaklaşımıyla yerel geliştirme ortamı (M3 Mac - ARM64) ile hedef sunucu arasındaki mimari farklar yönetilebilir. Bu çözüm sistemin mimari bağımsızlığını sağlayabilmektedir; ancak prodüksiyon ölçeğinde bu süreç yerel sanal makineler yerine **Jenkins/GitHub Actions** gibi merkezi araçlar ve **Harbor** gibi kurumsal bir kayıt defteri ile çözülebilir.
